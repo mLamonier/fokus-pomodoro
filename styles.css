@@ -6,7 +6,7 @@
     --lils: #B872FF;
     --linear-botes: linear-gradient(180deg, #B872FF 0%, #144480 100%);
     --azul-profundo: #01080E;
-    --fundo-card: rgba(255, 255, 255, 0.50);
+    --fundo-card: rgba(255, 255, 255, 0.65);
     --fundo-card-concludo: rgba(0, 244, 191, 0.40);
 }
 
@@ -146,7 +146,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .app__card-primary-button {
     padding: 0.8rem;
-    width: 12rem;
+    width: 15rem;
     color: var(--color-secondary);
     border: none;
     cursor: pointer;
@@ -488,7 +488,7 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     cursor: pointer;
     outline: inherit;
-    background-color: transparent;
+    background-color: rgba(47, 2, 88, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;

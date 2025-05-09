@@ -11,12 +11,31 @@ const iniciarOuPausarBt = document.querySelector('#start-pause span');
 const iconeIniciarOuPausarBt = document.querySelector('.app__card-primary-butto-icon');
 const tempoNaTela = document.querySelector('#timer');
 
+//3 objetos JavaScript para ter mais controle sobre cada botao
+const objetoBtnFoco = {
+    nome: 'foco',
+    tempo: 1500 //25 min * 60 seg
+}
+const objetoBtnDescansoCurto = {
+    nome: 'descanso-curto',
+    tempo: 300 //5 min * 60 seg
+}
+const objetoBtnDescansoLongo = {
+    nome: 'descanso-longo',
+    tempo: 900 //15 min * 60 seg
+}
+
+//array dos objetos para ser usado na forEach para recomeçar o contador
+const objetosBtn = [objetoBtnFoco, objetoBtnDescansoCurto, objetoBtnDescansoLongo];
+
+let botaoSelecionado = 'foco'; //pré-selecionado 'foco', se não quisesse pré-seleção, seria 'null'
+
 const musica = new Audio('./sons/luna-rise-part-one.mp3');
 const audioPlay = new Audio('./sons/play.wav');
 const audioPause = new Audio('./sons/pause.mp3');
 const audioBeep = new Audio('./sons/beep.mp3');
 
-let tempoDecorridoEmSegundos = 1500; //25 min / 60 seg
+let tempoDecorridoEmSegundos = objetoBtnFoco.tempo; //pré-selecionado tempo do 'foco'
 let intervaloId = null; // irá armazenar os valores da função setInterval
 
 musica.loop = true;
@@ -28,22 +47,25 @@ musicaFocoInput.addEventListener('change', () => {
     }
 })
 
-focoBt.addEventListener('click', async () => {
-    tempoDecorridoEmSegundos = 1500;
-    alterarContexto('foco');
+focoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = objetoBtnFoco.tempo;
+    alterarContexto(objetoBtnFoco.nome);
     focoBt.classList.add('active');
+    botaoSelecionado = objetoBtnFoco.nome;
 })
 
 curtoBt.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 300; //5 min * 60 seg
-    alterarContexto('descanso-curto');
+    tempoDecorridoEmSegundos = objetoBtnDescansoCurto.tempo; 
+    alterarContexto(objetoBtnDescansoCurto.nome);
     curtoBt.classList.add('active');
+    botaoSelecionado = objetoBtnDescansoCurto.nome;
 })
 
 longoBt.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 900; //15 min * 60 seg
-    alterarContexto('descanso-longo');
+    tempoDecorridoEmSegundos = objetoBtnDescansoLongo.tempo; 
+    alterarContexto(objetoBtnDescansoLongo.nome);
     longoBt.classList.add('active');
+    botaoSelecionado = objetoBtnDescansoLongo.nome;
 })
 
 function alterarContexto(contexto) {
@@ -91,9 +113,23 @@ const contagemRegressiva = () => {
     if(tempoDecorridoEmSegundos<= 0){
         audioBeep.play();
         alert('Tempo finalizado!');
+
+        //será criado somente para o contexto de 'foco' pois é quando o usuário estará estudando, os outros contextos são para descanso
+        const focoAtivo = html.getAttribute('data-contexto') == 'foco'; //booleano
+        if (focoAtivo) {
+            const evento = new CustomEvent('FocoFinalizado'); //cria um novo evento baseado em um objeto javascript
+            document.dispatchEvent(evento); //broadcast -> transmite o novo evento criado para o DOM, para pode ser usado no método addEventListener
+        }
+
         zerar();
-        // comando para forçar o recarregamento da página
-        location.reload();
+        iniciarOuPausarBt.textContent = 'Recomeçar';
+        //forEach para recomeçar o contador baseado no contexto que está selecionado
+        objetosBtn.forEach(objeto => {
+            if(objeto.nome === botaoSelecionado){
+                tempoDecorridoEmSegundos = objeto.tempo;
+            }
+        });
+        mostrarTempo();
         return;
     }
     // decrementação para simular contagem regressiva
